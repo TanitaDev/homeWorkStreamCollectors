@@ -1,12 +1,11 @@
 package com.tanita.ocpp.models;
 
-public class Order {
-    private Long id;
-    private String orderName;
+import java.util.List;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+public class Order {
+    private String orderName;
+    private List<OrderCargo> orderCargo;
+
 
     public String getOrderName() {
         return orderName;
@@ -16,15 +15,19 @@ public class Order {
         this.orderName = orderName;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     @Override
     public String toString() {
         return "Order{" +
-                "id=" + id +
-                ", orderName='" + orderName + '\'' +
+                "orderName='" + orderName + '\'' +
+                ", orderCargo=" + orderCargo +
                 '}';
+    }
+
+    public List<OrderCargo> getOrderCargo() {
+        return orderCargo;
+    }
+
+    public void setOrderCargo(List<OrderCargo> orderCargo) {
+        this.orderCargo = orderCargo;
     }
 }

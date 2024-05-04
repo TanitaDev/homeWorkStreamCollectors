@@ -1,6 +1,6 @@
 package com.tanita.ocpp;
 
-import com.tanita.ocpp.models.Order;
+import com.tanita.ocpp.models.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -16,7 +16,7 @@ public class OcpPApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(OcpPApplication.class, args);
-//
+
 //        Random random = new Random();
 //        AtomicInteger i = new AtomicInteger();
 //
@@ -50,15 +50,54 @@ public class OcpPApplication {
 //
 //        System.out.println(result);
 
-
+        List<CargoStatus> cargoStatuses = List.of(CargoStatus.CANCEL, CargoStatus.PLACED, CargoStatus.LAST_DAY);
+        List<CellStatus> cellStatuses = List.of(CellStatus.CELL_WORKING, CellStatus.CELL_BROKEN, CellStatus.CELL_BLOCKED);
 
         List<Order> orders = Stream.generate(() -> {
-            Order order = new Order();
-            order.setId(new Random().nextLong(6));
-            order.setOrderName("order" + new Random().nextInt(6));
-            return order;
-        }).limit(5).toList();
+                    Order order = new Order();
+                    order.setOrderName("order" + new Random().nextInt(6));
+                    order.setOrderCargo(List.of(new OrderCargo(cargoStatuses.get(new Random().nextInt(3)), new Cell(cellStatuses.get(new Random().nextInt(3)))),
+                            new OrderCargo(cargoStatuses.get(new Random().nextInt(3)), new Cell(cellStatuses.get(new Random().nextInt(3))))));
+                    return order;
+                })
+                .limit(5).toList();
+
+//
+//        Map<CellStatus, List<Order>> result2 = orders.stream()
+//                .collect(Collectors.groupingBy(
+//                        order -> order.getOrderCargo().stream()
+//                                .map(OrderCargo::getCell)
+//                                .findFirst().map(Cell::getCellStatus)
+//                                .orElse(CellStatus.CELL_BLOCKED)
+//                ));
+
+        Map<CellStatus, List<Order>> result2 = orders.stream()
+                .collect(Collectors.groupingBy(
+                        order -> order.getOrderCargo().stream()
+                                .filter(cargo -> cargo.getCargoStatus() == CargoStatus.PLACED)
+                                .map(OrderCargo::getCell)
+                                .findFirst().map(Cell::getCellStatus)
+                                .orElse(CellStatus.CELL_BROKEN)
+                ));
+
+
+        Map<CellStatus, List<CargoStatus>> result = orders.stream()
+                .flatMap(order -> order.getOrderCargo().stream())
+                .collect(Collectors.groupingBy(
+                        cargo -> cargo.getCell().getCellStatus(),
+                        Collectors.mapping(OrderCargo::getCargoStatus, Collectors.toList())
+                ));
+
+
+
         System.out.println(orders);
+        System.out.println("-".repeat(15));
+        System.out.println(result2);
+        System.out.println("-".repeat(15));
+        System.out.println(result);
+
+
+        //{cellStatus=[CargoPlaced, CargoPlaced, CargoPlaced]}
     }
 
     static class User {
@@ -72,7 +111,7 @@ public class OcpPApplication {
         }
     }
 
-    record UserAndAddress (Integer userId, String address) {
+    record UserAndAddress(Integer userId, String address) {
 
     }
 }

@@ -1,7 +1,7 @@
 package com.tanita.ocpp.models;
 
 public enum CellStatus {
-    BROKEN,
-    WORKING,
-    BLOCKED
+    CELL_BROKEN,
+    CELL_WORKING,
+    CELL_BLOCKED
 }

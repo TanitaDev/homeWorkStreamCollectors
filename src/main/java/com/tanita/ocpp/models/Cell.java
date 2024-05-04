@@ -1,7 +1,19 @@
 package com.tanita.ocpp.models;
 
 public class Cell {
-    private Long id;
+    private CellStatus cellStatus;
 
-    private String cellName;
+    public Cell(CellStatus cellStatus) {
+        this.cellStatus = cellStatus;
+    }
+
+    public CellStatus getCellStatus() {
+        return cellStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "Cell: " +
+                "cellStatus=" + cellStatus;
+    }
 }
