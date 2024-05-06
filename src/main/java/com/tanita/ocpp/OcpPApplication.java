@@ -62,15 +62,6 @@ public class OcpPApplication {
                 })
                 .limit(5).toList();
 
-//
-//        Map<CellStatus, List<Order>> result2 = orders.stream()
-//                .collect(Collectors.groupingBy(
-//                        order -> order.getOrderCargo().stream()
-//                                .map(OrderCargo::getCell)
-//                                .findFirst().map(Cell::getCellStatus)
-//                                .orElse(CellStatus.CELL_BLOCKED)
-//                ));
-
         Map<CellStatus, List<Order>> result2 = orders.stream()
                 .collect(Collectors.groupingBy(
                         order -> order.getOrderCargo().stream()
@@ -89,15 +80,24 @@ public class OcpPApplication {
                 ));
 
 
+        Map<CellStatus, List<OrderCargo>> groupedByCellStatus = orders.stream()
+                .flatMap(order -> order.getOrderCargo().stream())
+                .filter(cargo -> cargo.getCargoStatus() == CargoStatus.PLACED)
+                .collect(Collectors.groupingBy(cargo -> cargo.getCell().getCellStatus()));
+
+
+        System.out.println(groupedByCellStatus);
 
         System.out.println(orders);
         System.out.println("-".repeat(15));
         System.out.println(result2);
         System.out.println("-".repeat(15));
         System.out.println(result);
+        System.out.println("-".repeat(15));
+        System.out.println(groupedByCellStatus);
 
 
-        //{cellStatus=[CargoPlaced, CargoPlaced, CargoPlaced]}
+        //{cellStatus=[OrderCargo=[cargoStatus=PLACED], OrderCargo=[cargoStatus=PLACED], OrderCargo=[cargoStatus=PLACED]]}
     }
 
     static class User {
